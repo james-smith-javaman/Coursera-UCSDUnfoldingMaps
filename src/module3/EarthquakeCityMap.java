@@ -4,7 +4,9 @@ package module3;
 import java.util.ArrayList;
 //import java.util.Collections;
 //import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 //Processing library
 import processing.core.PApplet;
@@ -86,8 +88,16 @@ public class EarthquakeCityMap extends PApplet {
 	    // Here is an example of how to use Processing's color method to generate 
 	    // an int that represents the color yellow.  
 	    int yellow = color(255, 255, 0);
-	    
+
 	    //TODO: Add code here as appropriate
+
+        for (PointFeature pf: earthquakes) {
+            markers.add(createMarker(pf));
+        }
+
+        defineMarkersView(markers);
+
+        map.addMarkers(markers);
 	}
 		
 	// A suggested helper method that takes in an earthquake feature and 
@@ -96,7 +106,11 @@ public class EarthquakeCityMap extends PApplet {
 	private SimplePointMarker createMarker(PointFeature feature)
 	{
 		// finish implementing and use this method, if it helps.
-		return new SimplePointMarker(feature.getLocation());
+
+        HashMap<String, Object> property = new HashMap<String, Object>();
+        property.put("magnitude", feature.getProperty("magnitude"));
+
+		return new SimplePointMarker(feature.getLocation(), property);
 	}
 	
 	public void draw() {
@@ -108,9 +122,57 @@ public class EarthquakeCityMap extends PApplet {
 
 	// helper method to draw key in GUI
 	// TODO: Implement this method to draw the key
-	private void addKey() 
+	private void addKey()
 	{	
 		// Remember you can use Processing's graphics methods here
-	
 	}
+
+    private void defineMarkersView(List<Marker> markers)
+    {
+        // Remember you can use Processing's graphics methods here
+
+        float lowMark = 4.0f;
+        float highMark = 5.0f;
+        float smallRadius = 5.0f;
+        float mediumRadius = 10.0f;
+        float bigRadius = 15.0f;
+
+        for (Marker mrk: markers) {
+            Object magObj = mrk.getProperty("magnitude");
+            float mag = Float.parseFloat(magObj.toString());
+
+            int comparisonToLow = Float.compare(mag, lowMark);
+            if (comparisonToLow < 0) {
+                // magnitude less than 4.0
+                // fill marker with blue and small radius
+
+                mrk.setColor(color(0, 128, 255));
+                mrk.setStrokeColor(color(0, 0, 0));
+                //mrk.setStrokeWeight(4);
+                //mrk.setRadius(smallRadius);
+            }
+            if (comparisonToLow >= 0) {
+                // magnitude more than 4.0
+                int comparisonToHigh = Float.compare(mag, highMark);
+                if (comparisonToHigh < 0) {
+                    // magnitude more than 4.0, but less than 5.0
+                    // fill marker with yellow and medium radius
+                    System.out.println("Should be yellow. Mag: " + mag);
+                    mrk.setColor(color(255, 255, 0));
+                    mrk.setStrokeColor(color(0, 0, 0));
+                    //mrk.setStrokeWeight(4);
+                    //mrk.setRadius(mediumRadius);
+                }
+                else {
+                    // magnitude more than 5.0
+                    // fill marker with red and big radius
+
+                    mrk.setColor(color(255, 0, 0));
+                    mrk.setStrokeColor(color(0, 0, 0));
+                    //mrk.setStrokeWeight(4);
+                    //mrk.setRadius(bigRadius);
+                }
+            }
+        }
+    }
 }

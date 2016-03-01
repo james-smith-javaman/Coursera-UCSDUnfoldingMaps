@@ -1,5 +1,7 @@
 package demos;
 
+import de.fhpotsdam.unfolding.geo.Location;
+import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import processing.core.PApplet;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.utils.MapUtils;
@@ -28,6 +30,8 @@ public class LifeExpectancy extends PApplet {
 	HashMap<String, Float> lifeExpMap;
 	List<Feature> countries;
 	List<Marker> countryMarkers;
+	Location  location = new Location(49.8, 24.0);
+    SimplePointMarker myMarker;
 
 	public void setup() {
 		size(800, 600, OPENGL);
@@ -46,6 +50,9 @@ public class LifeExpectancy extends PApplet {
 		
 		// Country markers are shaded according to life expectancy (only once)
 		shadeCountries();
+
+        myMarker = new SimplePointMarker(location);
+
 	}
 
 	public void draw() {
@@ -76,6 +83,7 @@ public class LifeExpectancy extends PApplet {
 	private HashMap<String, Float> loadLifeExpectancyFromCSV(String fileName) {
 		HashMap<String, Float> lifeExpMap = new HashMap<String, Float>();
 
+		System.out.println("Before Load\n" + "file name: " + fileName);
 		String[] rows = loadStrings(fileName);
 		for (String row : rows) {
 			// Reads country name and population density value from CSV row
