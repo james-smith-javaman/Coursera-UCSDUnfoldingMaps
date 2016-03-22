@@ -53,14 +53,14 @@ public class EarthquakeCityMap extends PApplet {
 
 	
 	public void setup() {
-		size(950, 600, OPENGL);
+		size(1020, 600, OPENGL);
 
 		if (offline) {
-		    map = new UnfoldingMap(this, 200, 50, 700, 500, new MBTilesMapProvider(mbTilesString));
+		    map = new UnfoldingMap(this, 240, 50, 760, 500, new MBTilesMapProvider(mbTilesString));
 		    earthquakesURL = "2.5_week.atom"; 	// Same feed, saved Aug 7, 2015, for working offline
 		}
 		else {
-			map = new UnfoldingMap(this, 200, 50, 700, 500, new Google.GoogleMapProvider());
+			map = new UnfoldingMap(this, 240, 50, 760, 500, new Google.GoogleMapProvider());
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
 			//earthquakesURL = "2.5_week.atom";
 		}
@@ -95,7 +95,7 @@ public class EarthquakeCityMap extends PApplet {
             markers.add(createMarker(pf));
         }
 
-        defineMarkersView(markers);
+        //defineMarkersView(markers);
 
         map.addMarkers(markers);
 	}
@@ -110,11 +110,17 @@ public class EarthquakeCityMap extends PApplet {
         HashMap<String, Object> property = new HashMap<String, Object>();
         property.put("magnitude", feature.getProperty("magnitude"));
 
-		return new SimplePointMarker(feature.getLocation(), property);
+        SimplePointMarker newMarker = new SimplePointMarker(feature.getLocation(), property);
+
+        defineMarkerView(newMarker);
+
+		//return new SimplePointMarker(feature.getLocation(), property);
+
+        return newMarker;
 	}
 	
 	public void draw() {
-	    background(10);
+	    background(183, 178, 178);
 	    map.draw();
 	    addKey();
 	}
@@ -125,53 +131,81 @@ public class EarthquakeCityMap extends PApplet {
 	private void addKey()
 	{	
 		// Remember you can use Processing's graphics methods here
+
+        //rect
+        fill(255, 255, 255);
+        rect(20, 50, 200, 270, 7);
+
+        //title
+        fill(0, 0, 0);
+        textSize(14);
+        text("Earthquake Key", 60, 70);
+
+        //red mark
+        fill(255, 0, 0);
+        ellipse(45, 120, 18, 18);
+        fill(0, 0, 0);
+        textSize(14);
+        text("5.0 + Magnitude", 75, 125);
+
+        //yellow mark
+        fill(255, 255, 0);
+        ellipse(45, 150, 13, 13);
+        fill(0, 0, 0);
+        textSize(14);
+        text("4.0 + Magnitude", 75, 155);
+
+        //blue mark
+        fill(0, 128, 255);
+        ellipse(45, 180, 8, 8);
+        fill(0, 0, 0);
+        textSize(14);
+        text("Below 4.0", 75, 185);
 	}
 
-    private void defineMarkersView(List<Marker> markers)
+    private void defineMarkerView(SimplePointMarker marker)
     {
         // Remember you can use Processing's graphics methods here
 
         float lowMark = 4.0f;
         float highMark = 5.0f;
-        float smallRadius = 5.0f;
-        float mediumRadius = 10.0f;
-        float bigRadius = 15.0f;
+        float smallRadius = 8.0f;
+        float mediumRadius = 13.0f;
+        float bigRadius = 18.0f;
 
-        for (Marker mrk: markers) {
-            Object magObj = mrk.getProperty("magnitude");
-            float mag = Float.parseFloat(magObj.toString());
+        Object magObj = marker.getProperty("magnitude");
+        float mag = Float.parseFloat(magObj.toString());
 
-            int comparisonToLow = Float.compare(mag, lowMark);
-            if (comparisonToLow < 0) {
-                // magnitude less than 4.0
-                // fill marker with blue and small radius
+        int comparisonToLow = Float.compare(mag, lowMark);
+        if (comparisonToLow < 0) {
+            // magnitude less than 4.0
+            // fill marker with blue and small radius
 
-                mrk.setColor(color(0, 128, 255));
-                mrk.setStrokeColor(color(0, 0, 0));
-                //mrk.setStrokeWeight(4);
-                //mrk.setRadius(smallRadius);
+            marker.setColor(color(0, 128, 255));
+            marker.setStrokeColor(color(0, 0, 0));
+            //marker.setStrokeWeight(4);
+            marker.setRadius(smallRadius);
+        }
+        if (comparisonToLow >= 0) {
+            // magnitude more than 4.0
+            int comparisonToHigh = Float.compare(mag, highMark);
+            if (comparisonToHigh < 0) {
+                // magnitude more than 4.0, but less than 5.0
+                // fill marker with yellow and medium radius
+
+                marker.setColor(color(255, 255, 0));
+                marker.setStrokeColor(color(0, 0, 0));
+                //marker.setStrokeWeight(4);
+                marker.setRadius(mediumRadius);
             }
-            if (comparisonToLow >= 0) {
-                // magnitude more than 4.0
-                int comparisonToHigh = Float.compare(mag, highMark);
-                if (comparisonToHigh < 0) {
-                    // magnitude more than 4.0, but less than 5.0
-                    // fill marker with yellow and medium radius
-                    System.out.println("Should be yellow. Mag: " + mag);
-                    mrk.setColor(color(255, 255, 0));
-                    mrk.setStrokeColor(color(0, 0, 0));
-                    //mrk.setStrokeWeight(4);
-                    //mrk.setRadius(mediumRadius);
-                }
-                else {
-                    // magnitude more than 5.0
-                    // fill marker with red and big radius
+            else {
+                // magnitude more than 5.0
+                // fill marker with red and big radius
 
-                    mrk.setColor(color(255, 0, 0));
-                    mrk.setStrokeColor(color(0, 0, 0));
-                    //mrk.setStrokeWeight(4);
-                    //mrk.setRadius(bigRadius);
-                }
+                marker.setColor(color(255, 0, 0));
+                marker.setStrokeColor(color(0, 0, 0));
+                //marker.setStrokeWeight(4);
+                marker.setRadius(bigRadius);
             }
         }
     }
